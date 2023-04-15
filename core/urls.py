@@ -25,6 +25,18 @@ urlpatterns = [
     # ================================================
 
     # =============== URL CATEGORY ===================
-    
+    path("create-category", CategoryView.create_category),
+    path("list-category", CategoryView.list_category),
+    path("search-category", CategoryView.search_category),
+    path("get-category/<pk>", CategoryView.get_category_by_id),
+    path("update-category/<pk>", CategoryView.update_category),
+    path("delete-category/<pk", CategoryView.delete_category),
+    # ================================================
+
+    # ============== URL BRANCH ======================
+    path("create-branch", BranchView.create_branch),
+    path("list-branch", BranchView.list_branch),
+    path("update-branch/<pk>", BranchView.update_branch),
+    path("delete-branch/<pk>", BranchView.delete_branch),
     # ================================================
 ]

@@ -185,3 +185,110 @@ class SupplierView():
         except Exception as e:
             return Response({"Message": "error", "Error": str(e)})
 # ===============================================================================
+
+# ================================ CATEGORY API =================================
+class CategoryView():
+    # Tạo mới danh mục 
+    @api_view(['POST'])
+    def create_category(request):
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=404)
+    
+    # Hiển thị danh sách các danh mục 
+    @api_view(['GET'])
+    def list_category(request):
+        list_category = Category.objects.all()
+        serializer = CategorySerializer(list_category, many=True)
+
+        return Response(serializer.data)
+    
+    # Tìm kiếm danh mục
+    @api_view(['GET'])
+    def search_category(request):
+        params = request.GET
+        keyword = params.get('keyword', '')
+        category = Category.objects.filter(QuerySet(category_name__icontains=keyword))
+        serializer = CategorySerializer(category, many=True)
+        return Response(serializer.data)
+    
+    # Lấy danh sách danh mục theo id
+    @api_view(['GET'])
+    def get_category_by_id(request, pk):
+        list_category = Category.objects.raw("SELECT * FROM core_category WHERE id = %s", [pk])
+        serializer = CategorySerializer(list_category, many=True)
+
+        return Response(serializer.data)
+    
+    # Cập nhật thông tin danh mục 
+    @api_view(['PUT'])
+    def update_category(request, pk):
+        category = Category.objects.get(pk=pk)
+        serializer = CategorySerializer(category, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"Message": "success", "Data": serializer.data})
+        else:
+            return Response({"Message": "error", "Data": serializer.errors})
+    
+    # Xóa thông tin danh mục
+    @api_view(['DELETE'])
+    def delete_category(request, pk):
+        try:
+            category = Category.objects.get(pk=pk)
+            category.delete()
+
+            return Response({"Message": "success"})
+        except Exception as e:
+            return Response({"Message": "error", "Error": str(e)})
+# ===============================================================================
+
+
+# ================================== API BRANCH =================================
+class BranchView():
+    # Tạo mới thương hiệu
+    @api_view(['POST'])
+    def create_branch(request):
+        serializer = BranchSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else: 
+            return Response(serializer.errors, status=404)
+    
+    # Hiển thị danh sách các nhãn hiệu
+    @api_view(['GET'])
+    def list_branch(request):
+        branch_list = Branch.objects.all()
+        serializer = BranchSerializer(branch_list, many=True)
+
+        return Response(serializer.data)
+    
+    # Cập nhật thông tin nhãn hàng
+    @api_view(['PUT'])
+    def update_branch(request, pk):
+        branch = Branch.objects.get(pk=pk)
+        serializer = BranchSerializer(branch, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"Message": "Success", "Data": serializer.data})
+        else:
+            return Response({"Message": "error", "Error": serializer.errors})
+    
+
+    # Xóa danh sách các nhãn hàng
+    @api_view(['DELETE'])
+    def delete_branch(request, pk):
+        try:
+            branch = Branch.objects.get(pk=pk)
+            branch.delete()
+
+            return Response({"Message": "sucess"})
+        except Exception as e:
+            return Response({"Message": "error", "Error": str(e)})
+# ===============================================================================
