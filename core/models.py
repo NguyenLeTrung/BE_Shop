@@ -9,6 +9,7 @@ class User(AbstractBaseUser):
     gender = models.BooleanField(null=True)
     date = models.DateField(null=True)
     phone = models.CharField(max_length=20)
+    status = models.BooleanField(null=True)
     address = models.CharField(max_length=255, null=True)
     create_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateField(null=True)
