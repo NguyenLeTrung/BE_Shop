@@ -292,3 +292,81 @@ class BranchView():
         except Exception as e:
             return Response({"Message": "error", "Error": str(e)})
 # ===============================================================================
+
+
+# ========================= API TICKER IMPORT ===================================
+class TicketImportView():
+    # Tạo mới nhập hàng
+    @api_view(['POST'])
+    def create_ticket(request):
+        serializer = TicketImportSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=404)
+    
+    # Lấy danh sách các đơn nhập hàng
+    @api_view(['GET'])
+    def list_ticket(request):
+        ticket_list = Ticket_import.objects.all()
+        serializer = TicketImportSerializer(ticket_list, many=True)
+        return Response(serializer.data)
+
+    # Xóa thông tin đơn nhập hàng
+    @api_view(['DELETE'])
+    def delete_ticket(request, pk):
+        try:
+            ticketimport = Ticket_import.objects.get(pk=pk)
+            ticketimport.status = 0
+
+            ticketimport.save()
+            return Response({"Message": "sucess"})
+        except Exception as e:
+            return Response({"Message": "error", "Error": str(e)})
+# ===============================================================================
+
+# ======================= IMPORT DETAIL API =====================================
+class ImportDetailView():
+    # Tạo mới chi tiết đơn hàng
+    @api_view(['POST'])
+    def create_ticketdetail(request):
+        serializer = TicketDetailSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+    
+
+    # Lấy danh sách chi tiết đơn hàng
+    @api_view(['GET'])
+    def ticketdetail_by_id(request, pk):
+        ticketdetail = Ticket_Import_Detail.objects.get(pk=pk)
+        serializer = TicketDetailSerializer(ticketdetail, many=True)
+        return Response(serializer.data)
+
+
+    # Cập nhật thông tin chi tiết đơn hàng
+    @api_view(['PUT'])
+    def update_ticketdetail(request, pk):
+        ticketdetail = Ticket_Import_Detail.objects.get(pk=pk)
+        serializer = TicketDetailSerializer(ticketdetail, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"Message": "success", "Data": serializer.data})
+        else:
+            return Response({"Message": "error", "Error": serializer.errors})
+    
+    # Xóa thông tin chi tiết hóa đơn
+    @api_view(['DELETE'])
+    def delete_ticketdetail(request, pk):
+        try:
+            ticketdetail = Ticket_Import_Detail.objects.get(pk=pk)
+            ticketdetail.delete()
+
+            return Response({"Message": "success"})
+        except Exception as e:
+            return Response({"Message": "error", "Error": str(e)})
+# ===============================================================================

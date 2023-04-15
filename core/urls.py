@@ -39,4 +39,17 @@ urlpatterns = [
     path("update-branch/<pk>", BranchView.update_branch),
     path("delete-branch/<pk>", BranchView.delete_branch),
     # ================================================
+
+    # ================= URL TICKET ===================
+    path("create-ticket", TicketImportView.create_ticket),
+    path("list-ticketimport", TicketImportView.list_ticket),
+    path("delete-ticketimport/<pk>", TicketImportView.delete_ticket),
+    # ================================================
+
+    # ============== URL TICKET DETAIL ===============
+    path("create-ticketdetail", ImportDetailView.create_ticketdetail),
+    path("ticketdetail/<pk>", ImportDetailView.ticketdetail_by_id),
+    path("update-ticketdetail/<pk>", ImportDetailView.update_ticketdetail),
+    path("delete-ticketdetail/<pk>", ImportDetailView.delete_ticketdetail),
+    # ================================================
 ]
