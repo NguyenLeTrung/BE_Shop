@@ -4,6 +4,7 @@ from django.db.models import QuerySet
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework import generics
 from .serializer import *
 from .models import *
 import datetime, jwt
@@ -128,6 +129,18 @@ class UserView():
             return Response({"Message": "Success"})
         except Exception as e:
             return Response({"Message": "error", "Error": str(e)})
+
+    
+    # Tạo tài khoản mới
+    @api_view(['POST'])
+    def create_user(request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        else:
+            return Response(serializer.errors, status=404)
     
 # ===============================================================================
 
@@ -296,22 +309,16 @@ class BranchView():
 
 # ========================= API TICKER IMPORT ===================================
 class TicketImportView():
-    # Tạo mới nhập hàng
-    @api_view(['POST'])
-    def create_ticket(request):
-        serializer = TicketImportSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=404)
-    
-    # Lấy danh sách các đơn nhập hàng
+    # Hiển thị danh sách phiếu nhập hàng
     @api_view(['GET'])
-    def list_ticket(request):
-        ticket_list = Ticket_import.objects.all()
-        serializer = TicketImportSerializer(ticket_list, many=True)
-        return Response(serializer.data)
+    def ticket_list(request):
+        queryset = Ticket_import.objects.select_related('supplier')
+
+        tickets = []
+        for ticket in queryset:
+            tickets.append({"code": ticket.code ,"supplier": ticket.supplier.supplier_name, "total_price": ticket.total_price, "create_date": ticket.create_date})
+
+        return Response(tickets)
 
     # Xóa thông tin đơn nhập hàng
     @api_view(['DELETE'])
@@ -324,6 +331,19 @@ class TicketImportView():
             return Response({"Message": "sucess"})
         except Exception as e:
             return Response({"Message": "error", "Error": str(e)})
+        
+class TickerAPIView(generics.GenericAPIView):
+    serializer_class = TicketImportSerializer
+
+    def post(self, request, *args, **kwargs):
+        data = request.data or []
+
+        if isinstance(data, list):
+            serializer = self.get_serializer(data=data, many=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        
+        return Response(serializer.data)
 # ===============================================================================
 
 # ======================= IMPORT DETAIL API =====================================
@@ -345,7 +365,6 @@ class ImportDetailView():
         ticketdetail = Ticket_Import_Detail.objects.get(pk=pk)
         serializer = TicketDetailSerializer(ticketdetail, many=True)
         return Response(serializer.data)
-
 
     # Cập nhật thông tin chi tiết đơn hàng
     @api_view(['PUT'])
@@ -399,6 +418,22 @@ class ProductView():
         serializer = ProductSerializer(product_list, many=True)
 
         return Response(serializer.data)
+    
+    # Lấy danh sách sản phẩm trong trang home
+    @api_view(['GET'])
+    def list_product_home(request):
+        list_product_home = Product.objects.raw("SELECT * FROM core_product limit 0, 16")
+        data = ProductSerializer(list_product_home, many=True).data
+
+        return Response(data)
+    
+    # Lấy danh sách sản phẩm trong trang shop
+    @api_view(['GET'])
+    def list_product_shop(request):
+        list_product_shop = Product.objects.raw("SELECT * FROM core_product limit 0, 15")
+        data = ProductSerializer(list_product_shop, many=True).data
+
+        return Response(data)
     
     # Cập nhật thông tin sản phẩm
     @api_view(['PUT'])

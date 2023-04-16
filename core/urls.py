@@ -14,6 +14,7 @@ urlpatterns = [
     path("search-user", UserView.search_user),
     path("update-user/<pk>", UserView.update_user),
     path("delete-user/<pk>", UserView.delete_user),
+    path("create-user", UserView.create_user),
     # ===============================================
 
     # =============== URL SUPPLIER ===================
@@ -41,9 +42,10 @@ urlpatterns = [
     # ================================================
 
     # ================= URL TICKET ===================
-    path("create-ticket", TicketImportView.create_ticket),
-    path("list-ticketimport", TicketImportView.list_ticket),
+    path("list-ticketimport", TicketImportView.ticket_list),
     path("delete-ticketimport/<pk>", TicketImportView.delete_ticket),
+    path("create-ticket", TickerAPIView.as_view()),
+
     # ================================================
 
     # ============== URL TICKET DETAIL ===============
@@ -61,6 +63,8 @@ urlpatterns = [
     path("product-by-id/<pk>", ProductView.product_by_id),
     path("search-product", ProductView.search_product),
     path("filter", ProductView.filter_product),
+    path("list-product-home", ProductView.list_product_home),
+    path("list-product-shop", ProductView.list_product_shop),
     # =================================================
 
     # ============ URL PRODUCT DETAIL =================
