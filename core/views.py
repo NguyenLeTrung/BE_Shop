@@ -370,3 +370,261 @@ class ImportDetailView():
         except Exception as e:
             return Response({"Message": "error", "Error": str(e)})
 # ===============================================================================
+
+
+# ================================ API PRODUCT ==================================
+class ProductView():
+    # Tạo sản phẩm mới
+    @api_view(['POST'])
+    def create_product(request):
+        serializer = ProductSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=404)
+        
+    # Lấy thông tin sản phẩm theo ID
+    @api_view(['GET'])
+    def product_by_id(request, pk):
+        prd = Product.objects.get(pk=pk)
+        serializer = ProductSerializer(prd, many=True)
+        return Response(serializer.data)
+    
+    # Lấy danh sách sản phẩm
+    @api_view(['GET'])
+    def list_product(request):
+        product_list = Product.objects.all()
+        serializer = ProductSerializer(product_list, many=True)
+
+        return Response(serializer.data)
+    
+    # Cập nhật thông tin sản phẩm
+    @api_view(['PUT'])
+    def update_product(request, pk):
+        product = Product.objects.get(pk=pk)
+        serializer = ProductSerializer(product, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"Message": "success", "Data": serializer.data})
+
+        else:
+            return Response({"Message": "error", "Error": serializer.errors})
+
+    # Xóa thông tin sản phẩm
+    @api_view(['DELETE'])
+    def delete_product(request, pk):
+        try:
+            data = request.data
+            product = Product.objects.get(pk=pk)
+            product.status = 0
+            product.save()
+        
+            return Response({'success': True})
+        except Exception as e:
+            return Response({'success': False, 'error': str(e)})
+        
+    # Tìm kiếm thông tin sản phẩm
+    @api_view(['GET'])
+    def search_product(request):
+        keyword = request.GET.get('keyword', '')
+        product_list = Product.objects.filter(
+            QuerySet(product_name__icontains=keyword)|
+            QuerySet(category__icontains=keyword)
+        )
+        data = ProductSerializer(product_list, many=True).data
+        
+        return Response(data)
+    
+    # Lọc sản phẩm
+    @api_view(['GET'])
+    def filter_product(request):
+        PAGE_SIZE = 5
+        params = request.GET
+        start = int(params.get('start', 0))
+        length = int(params.get('length', PAGE_SIZE))
+        branch = params.get('branch_id', '').strip()
+        color = params.get('color', '')
+        size = params.get('size', '')
+        
+        branch = branch.split(',') if branch else []
+        
+        product_list = Product.objects.filter(branch__in=branch, color__in=color, size__in=size)
+        items = product_list[start:start+length]
+        serializer = ProductSerializer(items, many=True)
+        
+        return Response({
+            'item': serializer.data    
+        })
+# ===============================================================================
+
+
+# ============================ API PRODUCT DETAIL ===============================
+class ProductDetailView():
+    # Tạo một thông tin sản phẩm chi tiết
+    @api_view(['POST'])
+    def create_productdetail(request):
+        serializer = ProductDetailSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=404)
+    
+    # Cập nhật thông tin sản phẩm chi tiết
+    @api_view(['PUT'])
+    def update_productdetail(request, pk):
+        productdt = Product_Detail.objects.get(pk=pk)
+        serializer = ProductDetailSerializer(productdt, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"Message": "success", "Data": serializer.data})
+        else:
+            return Response({"Message": "error", "Error": serializer.errors})
+
+    # Xóa chi tiết sản phẩm
+    @api_view(['DELETE'])
+    def delete_productdetail(request, pk):
+        try:
+            productdt = Product_Detail.objects.get(pk=pk)
+            productdt.delete()
+
+            return Response({"Message": "success"})
+        except Exception as e:
+            return Response({"Message": "error", "Error": str(e)})
+# ===============================================================================
+
+# ============================= API COLOR =======================================
+class ColorView():
+    # Lấy tất cả thông tin color
+    @api_view(['GET'])
+    def list_color(request):
+        list_color = Color.objects.all()
+        serializer = ColorSerializer(list_color, many=True)
+
+        return Response(serializer.data)
+# ===============================================================================
+
+
+# ============================== API SIZE =======================================
+class SizeView():
+    # Lấy tất cả thông tin size
+    @api_view(['GET'])
+    def list_size(request):
+        list_size = Size.objects.all()
+        serializer = SizeSerializer(list_size, many=True)
+        return Response(serializer.data)
+# ===============================================================================
+
+# ================================ API ORDER ====================================
+class OrderView():
+    # Tạo mới hóa đơn
+    @api_view(['POST'])
+    def create_order(request):
+        serializer = OrdersSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=404)
+    
+    # Lấy danh sách hóa đơn theo id
+    @api_view(['GET'])
+    def order_by_id(request, pk):
+        order = Orders.objects.get(pk=pk)
+        serializer = OrdersSerializer(order, many=True)
+
+        return Response(serializer.data)
+    
+    # Lấy danh sách các hóa đơn
+    @api_view(['GET'])
+    def list_orders(request):
+        list_order = Orders.objects.all()
+        serializer = OrdersSerializer(list_order, many=True)
+
+        return Response(serializer.data)
+
+    # Tìm kiếm thông tin hóa đơn
+    @api_view(['GET'])
+    def search_orders(self, request):
+        params = request.GET
+        keyword = params.get('keyword', '')
+        order = Orders.objects.filter(
+            QuerySet(order_code__icontains=keyword) | 
+            QuerySet(customer_name__icontains = keyword) | 
+            QuerySet(phone__icontains=keyword)
+            )
+        serializer = OrderItemlSerializer(order, many=True)
+        
+        return Response(serializer.data)
+    
+
+    # Cập nhật thông tin hóa đơn
+    @api_view(['PUT'])
+    def update_orders(request, pk):
+        order = Orders.objects.get(pk=pk)
+        serializer = OrdersSerializer(order, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"Message": "success", "Data": serializer.data})
+        
+        else:
+            return Response({"Message": "error", "Error": serializer.errors})
+
+    # Xóa thông tin hóa đơn
+    @api_view(['DELETE'])
+    def delete_orders(request, pk):
+        try:
+            orders = Orders.objects.get(pk=pk)
+            orders.status = 0
+
+            orders.save()
+            return Response({"Message": "success"})
+        except Exception as e:
+            return Response({"Message": "error", "Error": str(e)})
+# ===============================================================================
+
+# ================================ API ORDER DETAIL =============================
+class OrdersDetailView():
+    # Tạo mới chi tiết hóa đơn
+    @api_view(['POST'])
+    def create_orderdetail(request):
+        serializer = OrderItemlSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=404)
+    
+    # Cập nhật chi tiết hóa đơn
+    @api_view(['PUT'])
+    def update_orderdetail(request, pk):
+        orderdt = Orders_Item.objects.get(pk=pk)
+        serializer = OrderItemlSerializer(orderdt, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response({"Message": "success", "Data": serializer.data})
+        else:
+            return Response({"Message": "error", "Error": serializer.errors})
+
+    # Xóa thông tin chi tiết hóa đơn
+    @api_view(['DELETE'])
+    def delete_orderdetail(request, pk):
+        try:
+            orderitem = Orders_Item.objects.get(pk=pk)
+            orderitem.delete()
+
+            return Response({"Message": "success"})
+        except Exception as e:
+            return Response({"Message": "error", "Error": str(e)})
+# ===============================================================================

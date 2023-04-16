@@ -86,6 +86,7 @@ class Product_Detail(models.Model):
 class Ticket_import(models.Model):
     supplier = models.ForeignKey(Supplier, related_name="supplier%(app_label)s_%(class)s_related", on_delete=models.PROTECT)
     code = models.CharField(max_length=20)
+    total_price = models.FloatField(null=True)
     create_date = models.DateTimeField(auto_now_add=True)
     create_by = models.ForeignKey(User, related_name="create%(app_label)s_%(class)s_related", on_delete=models.PROTECT)
     status = models.BooleanField(default=True)

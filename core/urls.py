@@ -52,4 +52,43 @@ urlpatterns = [
     path("update-ticketdetail/<pk>", ImportDetailView.update_ticketdetail),
     path("delete-ticketdetail/<pk>", ImportDetailView.delete_ticketdetail),
     # ================================================
+
+    # ============= URL PRODUCT ======================
+    path("create-product", ProductView.create_product),
+    path("list-product", ProductView.list_product),
+    path("update-product/<pk>", ProductView.update_product),
+    path("delete-product/<pk>", ProductView.delete_product),
+    path("product-by-id/<pk>", ProductView.product_by_id),
+    path("search-product", ProductView.search_product),
+    path("filter", ProductView.filter_product),
+    # =================================================
+
+    # ============ URL PRODUCT DETAIL =================
+    path("create-productdt", ProductDetailView.create_productdetail),
+    path("update-productdt/<pk>", ProductDetailView.update_productdetail),
+    path("delete-productdt/<pk>", ProductDetailView.delete_productdetail),
+    # =================================================
+
+    # ================== URL COLOR ====================
+    path("list-color", ColorView.list_color),
+    # =================================================
+
+    # ================= URL SIZE ======================
+    path("list-size", SizeView.list_size),
+    # =================================================
+
+    # ================= URL ORDER =====================
+    path("create-order", OrderView.create_order),
+    path("order-by-id/<pk>", OrderView.order_by_id),
+    path("list-orders", OrderView.list_orders),
+    path("update_order/<pk>", OrderView.update_orders),
+    path("delete-order/<pk>", OrderView.delete_orders),
+    path("search-order", OrderView.search_orders),
+    # =================================================
+
+    # ================= URL ORDER DETAIL ==============
+    path("create-orderdetail", OrdersDetailView.create_orderdetail),
+    path("update-orderdetail/<pk>", OrdersDetailView.update_orderdetail),
+    path("delete-orderdetail/<pk>", OrdersDetailView.delete_orderdetail),
+    # =================================================
 ]
