@@ -31,7 +31,7 @@ urlpatterns = [
     path("search-category", CategoryView.search_category),
     path("get-category/<pk>", CategoryView.get_category_by_id),
     path("update-category/<pk>", CategoryView.update_category),
-    path("delete-category/<pk", CategoryView.delete_category),
+    path("delete-category/<pk>", CategoryView.delete_category),
     # ================================================
 
     # ============== URL BRANCH ======================
@@ -94,5 +94,6 @@ urlpatterns = [
     path("create-orderdetail", OrdersDetailView.create_orderdetail),
     path("update-orderdetail/<pk>", OrdersDetailView.update_orderdetail),
     path("delete-orderdetail/<pk>", OrdersDetailView.delete_orderdetail),
+    path("list-orderdetailbyid/<pk>", OrdersDetailView.getlist_orderitemby_id),
     # =================================================
 ]

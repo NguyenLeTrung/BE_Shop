@@ -162,10 +162,14 @@ class SupplierView():
     # Lấy danh sách các nhà cung cấp
     @api_view(['GET'])
     def list_supplier(request):
-        supplier_list = Supplier.objects.all()
-        serializer = SupplierSerializer(supplier_list, many=True)
-        return Response(serializer.data)
+        queryset = Supplier.objects.select_related('user')
 
+        suppliers = []
+        for supplier in queryset:
+            suppliers.append({"supplier_name": supplier.supplier_name, "phone": supplier.phone, 'address': supplier.address, 
+                            "create_date": supplier.create_date, "update_date": supplier.update_date, "create_by": supplier.create_by.username, "update_by": supplier.update_by.username})
+
+        return Response(suppliers)
     # Tìm kiếm nhà cung cấp
     @api_view(['GET'])
     def search_supplier(request):
@@ -214,9 +218,8 @@ class CategoryView():
     # Hiển thị danh sách các danh mục 
     @api_view(['GET'])
     def list_category(request):
-        list_category = Category.objects.all()
-        serializer = CategorySerializer(list_category, many=True)
-
+        category = Category.objects.all()
+        serializer = CategorySerializer(category, many=True)
         return Response(serializer.data)
     
     # Tìm kiếm danh mục
@@ -280,7 +283,7 @@ class BranchView():
         serializer = BranchSerializer(branch_list, many=True)
 
         return Response(serializer.data)
-    
+
     # Cập nhật thông tin nhãn hàng
     @api_view(['PUT'])
     def update_branch(request, pk):
@@ -407,9 +410,12 @@ class ProductView():
     # Lấy thông tin sản phẩm theo ID
     @api_view(['GET'])
     def product_by_id(request, pk):
-        prd = Product.objects.get(pk=pk)
-        serializer = ProductSerializer(prd, many=True)
-        return Response(serializer.data)
+        try:
+            prd = Product.objects.get(pk=pk)
+            serializer = ProductSerializer(prd)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response(serializer.errors)
     
     # Lấy danh sách sản phẩm
     @api_view(['GET'])
@@ -452,7 +458,6 @@ class ProductView():
     @api_view(['DELETE'])
     def delete_product(request, pk):
         try:
-            data = request.data
             product = Product.objects.get(pk=pk)
             product.status = 0
             product.save()
@@ -662,4 +667,15 @@ class OrdersDetailView():
             return Response({"Message": "success"})
         except Exception as e:
             return Response({"Message": "error", "Error": str(e)})
+    
+    # Lấy danh sách chi tiết hóa đơn theo id
+    @api_view(['GET'])
+    def getlist_orderitemby_id(request, pk):
+        queryset = Orders_Item.objects.filter(order = pk).select_related('product')
+        orderdt = []
+
+        for odt in queryset:
+            orderdt.append({"quantity": odt.quantity, "price": odt.price, "product": odt.product.product_name, 'order_id': odt.order.pk})
+
+        return Response(orderdt)
 # ===============================================================================
