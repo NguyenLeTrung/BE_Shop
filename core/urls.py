@@ -45,6 +45,7 @@ urlpatterns = [
     path("list-ticketimport", TicketImportView.ticket_list),
     path("delete-ticketimport/<pk>", TicketImportView.delete_ticket),
     path("create-ticket", TickerAPIView.as_view()),
+    path("create-ticket-import", TicketImportView.create_ticket_import),
 
     # ================================================
 

@@ -55,9 +55,15 @@ class UserView():
 
         user = UserSerializer(cursor, many=True).data
 
+        # Lấy role của tk
+        cursor = Role.objects.raw("SELECT r.* FROM core_user u JOIN core_user_role ur ON u.id = ur.user_id JOIN core_role r ON ur.role_id = r.id WHERE u.username = %s", [request.data["username"]])
+
+        role = RoleSerializer(cursor, many=True).data
+
         response.data = {
             'jwt': token,
-            'user': user
+            'user': user,
+            'role': role
         }
 
         return response
@@ -162,14 +168,9 @@ class SupplierView():
     # Lấy danh sách các nhà cung cấp
     @api_view(['GET'])
     def list_supplier(request):
-        queryset = Supplier.objects.select_related('user')
-
-        suppliers = []
-        for supplier in queryset:
-            suppliers.append({"supplier_name": supplier.supplier_name, "phone": supplier.phone, 'address': supplier.address, 
-                            "create_date": supplier.create_date, "update_date": supplier.update_date, "create_by": supplier.create_by.username, "update_by": supplier.update_by.username})
-
-        return Response(suppliers)
+        supplier = Supplier.objects.all()
+        serializer = SupplierSerializer(supplier, many=True)
+        return Response(serializer.data)
     # Tìm kiếm nhà cung cấp
     @api_view(['GET'])
     def search_supplier(request):
@@ -334,6 +335,16 @@ class TicketImportView():
             return Response({"Message": "sucess"})
         except Exception as e:
             return Response({"Message": "error", "Error": str(e)})
+        
+    @api_view(['POST'])
+    def create_ticket_import(request):
+        serializer = TicketImportSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+    
         
 class TickerAPIView(generics.GenericAPIView):
     serializer_class = TicketImportSerializer
