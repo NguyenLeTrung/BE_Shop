@@ -508,16 +508,15 @@ class ProductView():
     def filter_product(request):
         PAGE_SIZE = 5
         params = request.GET
-        start = int(params.get('start', 0))
-        length = int(params.get('length', PAGE_SIZE))
         branch = params.get('branch_id', '').strip()
-        color = params.get('color', '')
-        size = params.get('size', '')
+        category = params.get('category_id', '')
         
         branch = branch.split(',') if branch else []
+        category = category.split(',') if category else []
         
-        product_list = Product.objects.filter(branch__in=branch, color__in=color, size__in=size)
-        items = product_list[start:start+length]
+        product_list = Product.objects.filter(category__in=category) | Product.objects.filter(branch__in =branch)
+
+        items = product_list
         serializer = ProductSerializer(items, many=True)
         
         return Response({
