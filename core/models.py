@@ -67,7 +67,7 @@ class Product(models.Model):
     rate = models.FloatField(null=True)
     description = models.TextField(null=True)
     image = models.ImageField(upload_to=upload_to, null=True)
-    content = models.CharField(max_length=255)
+    content = models.CharField(max_length=4000)
     status = models.BooleanField()
     create_date = models.DateTimeField(auto_now_add=True)
     create_by = models.ForeignKey(User, related_name="create%(app_label)s_%(class)s_related", on_delete=models.PROTECT, null=True)
